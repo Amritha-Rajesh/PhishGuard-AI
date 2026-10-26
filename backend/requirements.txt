@@ -1,0 +1,7 @@
+flask>=3.0
+scikit-learn==1.8.0
+pandas>=2.2
+numpy>=1.26
+joblib>=1.3
+# production server for Linux hosting (Render, Railway ...); ignored on Windows
+gunicorn>=21; platform_system != "Windows"

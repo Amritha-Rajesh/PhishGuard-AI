@@ -1,0 +1,30 @@
+23:00:51 Loaded PhiUSIIL_Phishing_URL_Dataset.csv: 235795 rows x 56 columns
+23:00:57 Cleaning: {"rows_raw": 235795, "raw_class_counts": {"legitimate": 134850, "phishing": 100945}, "dropped_missing": 0, "urls_with_conflicting_labels": 0, "dropped_duplicate_urls": 425, "dropped_invalid_urls": 8, "hostnames_with_conflicting_labels": 58, "rows_removed_for_conflicting_hostnames": 159, "dropped_duplicate_hostnames": 16170, "rows_clean": 219033, "clean_class_counts": {"legitimate": 134792, "phishing": 84241}}
+23:01:03 Share of hostnames with <= 2 labels (e.g. example.com): {'legitimate': 0.851734524304113, 'phishing': 0.42513740340214384}
+23:01:03 Split: train=178705 test=40328 | train groups=139288 test groups=34822 | overlap hosts=0 groups=0
+23:01:03 Cross-validating Logistic Regression ...
+23:01:24     fold 1: recall=0.713 precision=0.894 f2=0.743
+23:01:26     fold 2: recall=0.718 precision=0.894 f2=0.747
+23:01:28     fold 3: recall=0.721 precision=0.889 f2=0.749
+23:01:28 Cross-validating Random Forest ...
+23:02:00     fold 1: recall=0.719 precision=0.888 f2=0.747
+23:02:12     fold 2: recall=0.722 precision=0.889 f2=0.750
+23:02:26     fold 3: recall=0.723 precision=0.886 f2=0.750
+23:02:26 Cross-validating Gradient Boosting ...
+23:02:55     fold 1: recall=0.726 precision=0.893 f2=0.754
+23:03:07     fold 2: recall=0.732 precision=0.904 f2=0.761
+23:03:18     fold 3: recall=0.736 precision=0.891 f2=0.762
+23:03:18 Selected model: Gradient Boosting (mean CV phishing F2 = 0.7592)
+23:03:40 TEST: acc=0.8501 precision=0.8552 recall=0.6540 f1=0.7412 auc=0.8714 FNR=0.3460 | TN=25624 FP=1466 FN=4580 TP=8658
+23:04:02 ABLATION (without ['num_dots', 'num_labels']): acc=0.8487 recall=0.6543 auc=0.8706
+23:04:12   illustrative: google.com                                 P(phishing)=0.256
+23:04:12   illustrative: github.com                                 P(phishing)=0.255
+23:04:12   illustrative: wikipedia.org                              P(phishing)=0.101
+23:04:12   illustrative: amazon.com                                 P(phishing)=0.241
+23:04:12   illustrative: mail.python.org                            P(phishing)=0.806
+23:04:12   illustrative: accounts.google.com                        P(phishing)=0.973
+23:04:12   illustrative: paypal-secure-login.verify-account.xyz     P(phishing)=1.000
+23:04:12   illustrative: secure-update.bank-login.top               P(phishing)=1.000
+23:04:12   illustrative: xj3k9q2vz.top                              P(phishing)=0.994
+23:04:12   illustrative: 192.168.10.5                               P(phishing)=0.999
+23:04:12 Saved model -> /home/claude/PhishGuard-AI/backend/models/phishguard_model.joblib, report -> /home/claude/PhishGuard-AI/backend/reports/training_report.json (202.5 s)

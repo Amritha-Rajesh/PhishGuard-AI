@@ -1,0 +1,862 @@
+{
+  "generated_at": "2026-10-26T23:04:12+00:00",
+  "training_seconds": 202.4,
+  "seed": 42,
+  "versions": {
+    "python": "3.12.3",
+    "scikit_learn": "1.8.0",
+    "pandas": "3.0.2",
+    "numpy": "2.4.4"
+  },
+  "dataset": {
+    "file": "PhiUSIIL_Phishing_URL_Dataset.csv",
+    "sha256": "a236549cd369cd80bd478ff8e1779cbf44c58d5c3f79f7a51a1adbed7d06d1c6",
+    "rows_raw": 235795,
+    "columns_raw": 56,
+    "label_mapping": {
+      "dataset_1": "legitimate",
+      "dataset_0": "phishing"
+    },
+    "used_columns": [
+      "URL",
+      "label"
+    ],
+    "sampled": false
+  },
+  "cleaning": {
+    "rows_raw": 235795,
+    "raw_class_counts": {
+      "legitimate": 134850,
+      "phishing": 100945
+    },
+    "dropped_missing": 0,
+    "urls_with_conflicting_labels": 0,
+    "dropped_duplicate_urls": 425,
+    "dropped_invalid_urls": 8,
+    "invalid_url_reasons": {
+      "URL is too long (maximum 2048 characters).": 8
+    },
+    "hostnames_with_conflicting_labels": 58,
+    "rows_removed_for_conflicting_hostnames": 159,
+    "dropped_duplicate_hostnames": 16170,
+    "rows_clean": 219033,
+    "clean_class_counts": {
+      "legitimate": 134792,
+      "phishing": 84241
+    }
+  },
+  "class_distribution": {
+    "raw": {
+      "legitimate": 134850,
+      "phishing": 100945
+    },
+    "after_cleaning": {
+      "legitimate": 134792,
+      "phishing": 84241
+    },
+    "train": {
+      "legitimate": 107702,
+      "phishing": 71003
+    },
+    "test": {
+      "legitimate": 27090,
+      "phishing": 13238
+    }
+  },
+  "hostname_structure_check": {
+    "share_with_two_or_fewer_labels": {
+      "legitimate": 0.851734524304113,
+      "phishing": 0.42513740340214384
+    }
+  },
+  "split": {
+    "strategy": "GroupShuffleSplit by registered domain (e.g. example.com)",
+    "test_size": 0.2,
+    "train_rows": 178705,
+    "test_rows": 40328,
+    "train_groups": 139288,
+    "test_groups": 34822,
+    "overlapping_hostnames": 0,
+    "overlapping_groups": 0
+  },
+  "features": [
+    {
+      "name": "host_length",
+      "type": "numeric",
+      "description": "Number of characters in the normalized hostname"
+    },
+    {
+      "name": "num_dots",
+      "type": "numeric",
+      "description": "Number of dots in the hostname"
+    },
+    {
+      "name": "num_hyphens",
+      "type": "numeric",
+      "description": "Number of hyphens in the hostname"
+    },
+    {
+      "name": "num_digits",
+      "type": "numeric",
+      "description": "Number of digits in the hostname"
+    },
+    {
+      "name": "digit_ratio",
+      "type": "numeric",
+      "description": "Digits divided by hostname length"
+    },
+    {
+      "name": "num_labels",
+      "type": "numeric",
+      "description": "Number of dot-separated parts (labels) in the hostname"
+    },
+    {
+      "name": "longest_label_len",
+      "type": "numeric",
+      "description": "Length of the longest label"
+    },
+    {
+      "name": "avg_label_len",
+      "type": "numeric",
+      "description": "Average label length"
+    },
+    {
+      "name": "first_label_len",
+      "type": "numeric",
+      "description": "Length of the left-most label"
+    },
+    {
+      "name": "entropy",
+      "type": "numeric",
+      "description": "Shannon entropy of the hostname characters (higher = more random-looking)"
+    },
+    {
+      "name": "is_ip",
+      "type": "numeric",
+      "description": "1 if the host is an IP address, else 0"
+    },
+    {
+      "name": "tld_length",
+      "type": "numeric",
+      "description": "Length of the top-level domain (the last label)"
+    },
+    {
+      "name": "has_punycode",
+      "type": "numeric",
+      "description": "1 if any label starts with 'xn--' (internationalised domain), else 0"
+    },
+    {
+      "name": "vowel_ratio",
+      "type": "numeric",
+      "description": "Vowels divided by letters in the hostname"
+    },
+    {
+      "name": "max_consonant_run",
+      "type": "numeric",
+      "description": "Longest run of consecutive consonants"
+    },
+    {
+      "name": "max_digit_run",
+      "type": "numeric",
+      "description": "Longest run of consecutive digits"
+    },
+    {
+      "name": "num_suspicious_keywords",
+      "type": "numeric",
+      "description": "How many words from a fixed keyword list (login, secure, verify ...) appear in the hostname"
+    },
+    {
+      "name": "tld",
+      "type": "categorical",
+      "description": "Top-level domain as a category (rare TLDs are grouped together by the encoder)"
+    }
+  ],
+  "selection": {
+    "method": "3-fold StratifiedGroupKFold on the training part",
+    "criterion": "highest mean phishing F2 (recall-weighted)",
+    "selected": "Gradient Boosting"
+  },
+  "candidates": [
+    {
+      "name": "Logistic Regression",
+      "description": "Simple linear baseline; easy to explain; needs scaled inputs.",
+      "cv": {
+        "accuracy": {
+          "mean": 0.8531882150805731,
+          "std": 0.0007814817804073086
+        },
+        "precision": {
+          "mean": 0.8920960068813862,
+          "std": 0.0024788785185249785
+        },
+        "recall": {
+          "mean": 0.7172654072428818,
+          "std": 0.0032775641584848005
+        },
+        "f1": {
+          "mean": 0.7951752040136717,
+          "std": 0.0014605869047018129
+        },
+        "f2": {
+          "mean": 0.7465209239462184,
+          "std": 0.0025971944181483867
+        },
+        "roc_auc": {
+          "mean": 0.8905108471124178,
+          "std": 0.001612735108591762
+        },
+        "false_negative_rate": {
+          "mean": 0.28273459275711815,
+          "std": 0.0032775641584848036
+        }
+      },
+      "selected": false
+    },
+    {
+      "name": "Random Forest",
+      "description": "Many decision trees voting together; handles non-linear patterns and mixed features.",
+      "cv": {
+        "accuracy": {
+          "mean": 0.8530762994828337,
+          "std": 0.0006207795801670816
+        },
+        "precision": {
+          "mean": 0.8880074099637608,
+          "std": 0.0013254913001464982
+        },
+        "recall": {
+          "mean": 0.7211666786241663,
+          "std": 0.0016679764592133933
+        },
+        "f1": {
+          "mean": 0.7959360107951093,
+          "std": 0.0009847883434402414
+        },
+        "f2": {
+          "mean": 0.7493225516896879,
+          "std": 0.001391696539069553
+        },
+        "roc_auc": {
+          "mean": 0.8894199312892463,
+          "std": 0.0014292696062844334
+        },
+        "false_negative_rate": {
+          "mean": 0.2788333213758338,
+          "std": 0.0016679764592133848
+        }
+      },
+      "selected": false
+    },
+    {
+      "name": "Gradient Boosting",
+      "description": "Trees built one after another, each fixing the previous errors; strong on tabular data.",
+      "cv": {
+        "accuracy": {
+          "mean": 0.8594723163906973,
+          "std": 0.0023398587454159393
+        },
+        "precision": {
+          "mean": 0.8958597356384708,
+          "std": 0.005578665072414573
+        },
+        "recall": {
+          "mean": 0.7313633890242893,
+          "std": 0.004083198530265221
+        },
+        "f1": {
+          "mean": 0.8052817029097321,
+          "std": 0.0031644659752027055
+        },
+        "f2": {
+          "mean": 0.7592374285111623,
+          "std": 0.0035230855491232183
+        },
+        "roc_auc": {
+          "mean": 0.8994155068013753,
+          "std": 0.0018266006563635708
+        },
+        "false_negative_rate": {
+          "mean": 0.2686366109757106,
+          "std": 0.004083198530265245
+        }
+      },
+      "selected": true
+    }
+  ],
+  "final_model": {
+    "name": "Gradient Boosting",
+    "decision_threshold": 0.5,
+    "test": {
+      "accuracy": 0.8500793493354493,
+      "precision": 0.8551955748715923,
+      "recall": 0.6540262879589062,
+      "f1": 0.741203664069857,
+      "f2": 0.6863149216817807,
+      "roc_auc": 0.871398773656896,
+      "specificity": 0.9458840900701366,
+      "false_negative_rate": 0.34597371204109384,
+      "false_positive_rate": 0.05411590992986342,
+      "tn": 25624,
+      "fp": 1466,
+      "fn": 4580,
+      "tp": 8658
+    },
+    "confusion_matrix": {
+      "tn": 25624,
+      "fp": 1466,
+      "fn": 4580,
+      "tp": 8658
+    },
+    "roc": {
+      "fpr": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0001,
+        0.0003,
+        0.0005,
+        0.0006,
+        0.0007,
+        0.001,
+        0.0012,
+        0.0014,
+        0.0017,
+        0.002,
+        0.0024,
+        0.0029,
+        0.0035,
+        0.0042,
+        0.0047,
+        0.0056,
+        0.0063,
+        0.0074,
+        0.0082,
+        0.0095,
+        0.0109,
+        0.0121,
+        0.013,
+        0.0141,
+        0.0155,
+        0.0171,
+        0.0183,
+        0.0199,
+        0.0214,
+        0.0233,
+        0.0247,
+        0.0261,
+        0.0277,
+        0.0296,
+        0.0317,
+        0.0334,
+        0.0352,
+        0.0371,
+        0.039,
+        0.0411,
+        0.0434,
+        0.0448,
+        0.0467,
+        0.0484,
+        0.0502,
+        0.0528,
+        0.0556,
+        0.0582,
+        0.0605,
+        0.0627,
+        0.0646,
+        0.067,
+        0.0691,
+        0.0709,
+        0.0733,
+        0.0764,
+        0.0788,
+        0.0823,
+        0.0853,
+        0.0887,
+        0.092,
+        0.0968,
+        0.0998,
+        0.1033,
+        0.1065,
+        0.1103,
+        0.1137,
+        0.1172,
+        0.12,
+        0.124,
+        0.1272,
+        0.13,
+        0.133,
+        0.1379,
+        0.1408,
+        0.1448,
+        0.148,
+        0.1515,
+        0.1543,
+        0.1581,
+        0.1612,
+        0.1649,
+        0.1745,
+        0.1807,
+        0.1889,
+        0.1927,
+        0.1965,
+        0.1993,
+        0.2034,
+        0.2073,
+        0.2135,
+        0.2205,
+        0.2239,
+        0.2314,
+        0.2432,
+        0.2628,
+        0.2723,
+        0.2811,
+        0.3054,
+        0.3286,
+        0.3434,
+        0.3554,
+        0.3671,
+        0.3949,
+        0.4157,
+        0.431,
+        0.4397,
+        0.4553,
+        0.4799,
+        0.4922,
+        0.5051,
+        0.5326,
+        0.5429,
+        0.559,
+        0.5736,
+        0.5926,
+        0.613,
+        0.6325,
+        0.6412,
+        0.6449,
+        0.6489,
+        0.6542,
+        0.6586,
+        0.6625,
+        0.6657,
+        0.6692,
+        0.6746,
+        0.6801,
+        0.686,
+        0.6906,
+        0.6945,
+        0.6989,
+        0.7031,
+        0.7084,
+        0.7131,
+        0.7182,
+        0.722,
+        0.7272,
+        0.7326,
+        0.7372,
+        0.7423,
+        0.7473,
+        0.7517,
+        0.7576,
+        0.7653,
+        0.7723,
+        0.7812,
+        0.7874,
+        0.7946,
+        0.801,
+        0.8056,
+        0.8113,
+        0.8178,
+        0.824,
+        0.8297,
+        0.835,
+        0.8444,
+        0.8505,
+        0.855,
+        0.8597,
+        0.867,
+        0.872,
+        0.8766,
+        0.8811,
+        0.8855,
+        0.8908,
+        0.8951,
+        0.8997,
+        0.906,
+        0.9124,
+        0.9188,
+        0.9239,
+        0.9292,
+        0.9351,
+        0.9433,
+        0.9508,
+        0.9566,
+        0.9611,
+        0.9682,
+        0.9737,
+        0.9811,
+        0.9873,
+        0.9931,
+        1.0
+      ],
+      "tpr": [
+        0.0,
+        0.0143,
+        0.0276,
+        0.0406,
+        0.0554,
+        0.0751,
+        0.1129,
+        0.14,
+        0.1557,
+        0.1719,
+        0.1864,
+        0.2057,
+        0.2252,
+        0.2376,
+        0.2522,
+        0.2784,
+        0.3137,
+        0.3387,
+        0.36,
+        0.3806,
+        0.3975,
+        0.4159,
+        0.4282,
+        0.4408,
+        0.4548,
+        0.468,
+        0.4852,
+        0.4989,
+        0.5076,
+        0.5151,
+        0.5242,
+        0.5338,
+        0.5436,
+        0.5483,
+        0.5553,
+        0.5598,
+        0.5659,
+        0.5702,
+        0.5767,
+        0.5817,
+        0.5868,
+        0.5915,
+        0.5958,
+        0.6004,
+        0.603,
+        0.6073,
+        0.6098,
+        0.6132,
+        0.6175,
+        0.6204,
+        0.6231,
+        0.6267,
+        0.6292,
+        0.6314,
+        0.6341,
+        0.6366,
+        0.6388,
+        0.642,
+        0.6442,
+        0.6473,
+        0.6503,
+        0.6524,
+        0.655,
+        0.6577,
+        0.6604,
+        0.6631,
+        0.666,
+        0.6687,
+        0.6708,
+        0.6742,
+        0.677,
+        0.6787,
+        0.6814,
+        0.6845,
+        0.6874,
+        0.6907,
+        0.6937,
+        0.6969,
+        0.6987,
+        0.7018,
+        0.7042,
+        0.7079,
+        0.7114,
+        0.7135,
+        0.7158,
+        0.7179,
+        0.7214,
+        0.7239,
+        0.726,
+        0.7291,
+        0.7312,
+        0.7334,
+        0.7355,
+        0.738,
+        0.7397,
+        0.7425,
+        0.7446,
+        0.7471,
+        0.7516,
+        0.7565,
+        0.7589,
+        0.7609,
+        0.7633,
+        0.765,
+        0.7672,
+        0.7695,
+        0.7725,
+        0.7758,
+        0.7778,
+        0.7819,
+        0.7889,
+        0.7973,
+        0.8009,
+        0.8053,
+        0.8164,
+        0.826,
+        0.8337,
+        0.8396,
+        0.8447,
+        0.8553,
+        0.8634,
+        0.871,
+        0.8751,
+        0.8818,
+        0.8926,
+        0.8969,
+        0.9021,
+        0.9118,
+        0.9164,
+        0.9221,
+        0.9282,
+        0.936,
+        0.9433,
+        0.9494,
+        0.9527,
+        0.9537,
+        0.9554,
+        0.9564,
+        0.9578,
+        0.9588,
+        0.9597,
+        0.9609,
+        0.9622,
+        0.9631,
+        0.9639,
+        0.9651,
+        0.9661,
+        0.9671,
+        0.9683,
+        0.9691,
+        0.9699,
+        0.9707,
+        0.9715,
+        0.9723,
+        0.9731,
+        0.9738,
+        0.9743,
+        0.9748,
+        0.9755,
+        0.9761,
+        0.9773,
+        0.9782,
+        0.9801,
+        0.9812,
+        0.9823,
+        0.9834,
+        0.9844,
+        0.9854,
+        0.9859,
+        0.9865,
+        0.9874,
+        0.9882,
+        0.9895,
+        0.9903,
+        0.991,
+        0.9918,
+        0.9924,
+        0.9928,
+        0.9931,
+        0.9934,
+        0.9937,
+        0.9941,
+        0.9946,
+        0.9952,
+        0.9956,
+        0.9962,
+        0.9967,
+        0.9972,
+        0.9977,
+        0.9982,
+        0.9986,
+        0.9989,
+        0.9992,
+        0.9997,
+        0.9998,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "auc": 0.871398773656896
+    }
+  },
+  "baselines": {
+    "majority_class_accuracy": 0.6717417179131124
+  },
+  "ablation": {
+    "description": "Same model without ['num_dots', 'num_labels'] (checks reliance on hostname-structure features)",
+    "removed_features": [
+      "num_dots",
+      "num_labels"
+    ],
+    "test": {
+      "accuracy": 0.8486907359650863,
+      "precision": 0.8502159403219474,
+      "recall": 0.6543284484061036,
+      "f1": 0.7395201912405021,
+      "f2": 0.6859360152043079,
+      "roc_auc": 0.870626570510713,
+      "specificity": 0.9436692506459948,
+      "false_negative_rate": 0.34567155159389634,
+      "false_positive_rate": 0.056330749354005165,
+      "tn": 25564,
+      "fp": 1526,
+      "fn": 4576,
+      "tp": 8662
+    }
+  },
+  "feature_importance": [
+    {
+      "feature": "tld",
+      "importance": 0.11733765941889647
+    },
+    {
+      "feature": "num_dots",
+      "importance": 0.07232097248017381
+    },
+    {
+      "feature": "tld_length",
+      "importance": 0.03692967889015234
+    },
+    {
+      "feature": "num_digits",
+      "importance": 0.03246332276161812
+    },
+    {
+      "feature": "host_length",
+      "importance": 0.020610441237082666
+    },
+    {
+      "feature": "avg_label_len",
+      "importance": 0.010625763502761565
+    },
+    {
+      "feature": "first_label_len",
+      "importance": 0.010148352982464673
+    },
+    {
+      "feature": "num_hyphens",
+      "importance": 0.008741011401561175
+    },
+    {
+      "feature": "entropy",
+      "importance": 0.005292113846138258
+    },
+    {
+      "feature": "vowel_ratio",
+      "importance": 0.004183669568607273
+    },
+    {
+      "feature": "num_suspicious_keywords",
+      "importance": 0.003563392963664073
+    },
+    {
+      "feature": "longest_label_len",
+      "importance": 0.0035542561355675537
+    },
+    {
+      "feature": "max_consonant_run",
+      "importance": 0.0022451617119552867
+    },
+    {
+      "feature": "digit_ratio",
+      "importance": 0.0019220645666785015
+    },
+    {
+      "feature": "max_digit_run",
+      "importance": 0.00019782958174274778
+    },
+    {
+      "feature": "has_punycode",
+      "importance": 8.241148889072865e-05
+    },
+    {
+      "feature": "is_ip",
+      "importance": 0.0
+    },
+    {
+      "feature": "num_labels",
+      "importance": -9.90948268930758e-06
+    }
+  ],
+  "illustrative_examples": {
+    "note": "A handful of hand-picked hostnames to sanity-check behaviour. NOT an evaluation.",
+    "rows": [
+      {
+        "host": "google.com",
+        "phishing_probability": 0.2555
+      },
+      {
+        "host": "github.com",
+        "phishing_probability": 0.2547
+      },
+      {
+        "host": "wikipedia.org",
+        "phishing_probability": 0.1013
+      },
+      {
+        "host": "amazon.com",
+        "phishing_probability": 0.2412
+      },
+      {
+        "host": "mail.python.org",
+        "phishing_probability": 0.8059
+      },
+      {
+        "host": "accounts.google.com",
+        "phishing_probability": 0.9725
+      },
+      {
+        "host": "paypal-secure-login.verify-account.xyz",
+        "phishing_probability": 0.9999
+      },
+      {
+        "host": "secure-update.bank-login.top",
+        "phishing_probability": 0.9999
+      },
+      {
+        "host": "xj3k9q2vz.top",
+        "phishing_probability": 0.9943
+      },
+      {
+        "host": "192.168.10.5",
+        "phishing_probability": 0.9987
+      }
+    ]
+  }
+}

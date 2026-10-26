@@ -1,0 +1,63 @@
+{
+  "model_name": "Gradient Boosting",
+  "model_version": "1.0.0",
+  "trained_at": "2026-10-26T23:04:12+00:00",
+  "sklearn_version": "1.8.0",
+  "python_version": "3.12.3",
+  "analysis_scope": "hostname_only",
+  "target": {
+    "positive_class": "phishing",
+    "negative_class": "legitimate",
+    "classes_": [
+      0,
+      1
+    ]
+  },
+  "dataset_label_mapping": {
+    "1": "legitimate",
+    "0": "phishing"
+  },
+  "decision_threshold": 0.5,
+  "feature_columns": [
+    "host_length",
+    "num_dots",
+    "num_hyphens",
+    "num_digits",
+    "digit_ratio",
+    "num_labels",
+    "longest_label_len",
+    "avg_label_len",
+    "first_label_len",
+    "entropy",
+    "is_ip",
+    "tld_length",
+    "has_punycode",
+    "vowel_ratio",
+    "max_consonant_run",
+    "max_digit_run",
+    "num_suspicious_keywords",
+    "tld"
+  ],
+  "numeric_columns": [
+    "host_length",
+    "num_dots",
+    "num_hyphens",
+    "num_digits",
+    "digit_ratio",
+    "num_labels",
+    "longest_label_len",
+    "avg_label_len",
+    "first_label_len",
+    "entropy",
+    "is_ip",
+    "tld_length",
+    "has_punycode",
+    "vowel_ratio",
+    "max_consonant_run",
+    "max_digit_run",
+    "num_suspicious_keywords"
+  ],
+  "categorical_columns": [
+    "tld"
+  ]
+}
