@@ -110,10 +110,33 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/predict -ContentTy
 ```
 **Run the tests:** `cd backend; python -m unittest discover -s tests -t .` and `cd frontend; npm test` (with the backend running: `npm run test:integration`). See `docs/TEST_REPORT.md` for what was and was not executed.
 
-## 9. Deployment (separate hosting; instructions not yet tried)
-* **Backend (e.g. Render, Railway)**: root directory `backend`, build `pip install -r requirements.txt`, start `gunicorn app:app`, environment `FRONTEND_ORIGIN=https://your-frontend-url`. Commit `backend/models/` (the model is under 1 MB) or the API answers 503.
-* **Frontend (e.g. Vercel, Netlify)**: root `frontend`, build `npm run build`, output `dist`, environment `VITE_API_BASE_URL=https://your-backend-url`.
-* Free tiers may sleep; the first request can be slow. Never set `FRONTEND_ORIGIN` to `*`.
+## 9. Deployment (Single Web Service on Render)
+PhishGuard AI can be deployed on Render using **ONE web service and ONE public URL** hosting both the Flask API and the React frontend together.
+
+### Option A: Blueprint Deployment (Recommended)
+1. Sign in to [dashboard.render.com](https://dashboard.render.com/) with GitHub.
+2. Click **New +** &rarr; **Blueprint**.
+3. Select your repository `PhishGuard-AI`.
+4. Render automatically detects [render.yaml](file:///c:/Users/HP/Downloads/PhishGuard-AI/PhishGuard-AI/render.yaml) and configures the unified web service.
+5. Click **Apply**.
+
+### Option B: Manual Web Service Setup
+1. In the Render dashboard, click **New +** &rarr; **Web Service**.
+2. Connect your `PhishGuard-AI` repository.
+3. Configure the following settings:
+   - **Name**: `phishguard-ai` (or your choice)
+   - **Branch**: `main`
+   - **Root Directory**: *(leave blank to use the repository root)*
+   - **Runtime**: `Python 3`
+   - **Build Command**: `bash build.sh`
+   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT wsgi:app`
+   - **Instance Type**: **Free**
+4. Click **Deploy Web Service**.
+
+Both the React frontend UI and the Flask machine learning API run under this single public URL (e.g. `https://phishguard-ai.onrender.com`). No cross-origin CORS configuration is needed because API requests use the same domain.
+
+> [!NOTE]
+> On Render's free tier, inactive instances may spin down after 15 minutes of inactivity. The first request after sleep may take ~30–50 seconds to wake up.
 
 ## 10. Limitations
 * **Hostname only.** Paths, queries and page content are ignored, so phishing on legitimate or shared domains, shortened links and path tricks can be missed.
@@ -127,6 +150,7 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/predict -ContentTy
 ## 11. Folder structure
 ```
 PhishGuard-AI/
+  wsgi.py   build.sh   render.yaml   Procfile   requirements.txt
   backend/  app.py  train.py  feature_extractor.py  predictor.py  requirements.txt
             models/ (phishguard_model.joblib, model_meta.json)   reports/ (training_report.json, training_log.txt)
             data/ (put the CSV here)   tests/

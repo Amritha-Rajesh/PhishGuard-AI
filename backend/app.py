@@ -20,8 +20,8 @@ import logging
 import os
 from pathlib import Path
 
-from flask import Flask, jsonify, request
-from werkzeug.exceptions import HTTPException
+from flask import Flask, jsonify, request, send_from_directory
+from werkzeug.exceptions import HTTPException, MethodNotAllowed, NotFound
 
 from feature_extractor import InvalidURLError
 from predictor import ModelNotAvailableError, ModelService
@@ -34,12 +34,13 @@ def error(code: str, message: str, status: int):
     return jsonify({"error": {"code": code, "message": message}}), status
 
 
-def create_app(model_dir=None, report_dir=None, frontend_origin=None, service=None) -> Flask:
+def create_app(model_dir=None, report_dir=None, frontend_origin=None, frontend_dist=None, service=None) -> Flask:
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1024  # a URL request never needs more than 16 KB
     origins = [o.strip().rstrip("/") for o in
                (frontend_origin or os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173,http://127.0.0.1:5173")).split(",") if o.strip()]
     report_path = Path(report_dir or os.environ.get("PHISHGUARD_REPORT_DIR", HERE / "reports")) / "training_report.json"
+    dist_folder = Path(frontend_dist or os.environ.get("PHISHGUARD_FRONTEND_DIST", HERE.parent / "frontend" / "dist")).resolve()
 
     # the model is loaded ONCE here, never per request
     svc = service or ModelService(model_dir or os.environ.get("PHISHGUARD_MODEL_DIR", HERE / "models"))
@@ -63,16 +64,9 @@ def create_app(model_dir=None, report_dir=None, frontend_origin=None, service=No
             resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
             resp.headers["Access-Control-Max-Age"] = "600"
         resp.headers["X-Content-Type-Options"] = "nosniff"
-        resp.headers["Cache-Control"] = "no-store"
+        if request.path.startswith("/api/"):
+            resp.headers["Cache-Control"] = "no-store"
         return resp
-
-    @app.get("/")
-    def index():
-        return jsonify({
-            "service": "PhishGuard AI Backend",
-            "status": "running",
-            "health": "/api/health"
-        })
 
     @app.get("/api/health")
     def health():
@@ -106,6 +100,35 @@ def create_app(model_dir=None, report_dir=None, frontend_origin=None, service=No
             return jsonify(json.loads(report_path.read_text(encoding="utf-8")))
         except (OSError, ValueError):
             return error("report_unreadable", "The training report could not be read. Re-run: python train.py", 500)
+
+    @app.route("/", defaults={"path": ""}, methods=["GET", "HEAD"])
+    @app.route("/<path:path>", methods=["GET", "HEAD"])
+    def serve_frontend(path: str):
+        if path.startswith("api/") or path == "api":
+            full_path = "/" + path.rstrip("/")
+            for rule in app.url_map.iter_rules():
+                if rule.rule == full_path and rule.endpoint != "serve_frontend":
+                    if request.method not in rule.methods:
+                        raise MethodNotAllowed()
+            raise NotFound()
+
+        if dist_folder.is_dir():
+            target = (dist_folder / path).resolve()
+            try:
+                if path and target.is_file() and target.is_relative_to(dist_folder):
+                    return send_from_directory(dist_folder, path)
+            except (ValueError, TypeError):
+                pass
+            index_path = dist_folder / "index.html"
+            if index_path.is_file():
+                return send_from_directory(dist_folder, "index.html")
+
+        return jsonify({
+            "service": "PhishGuard AI",
+            "status": "running",
+            "health": "/api/health",
+            "message": "Frontend build not found at frontend/dist. In development, run 'npm run dev' in frontend/ or build with 'npm run build'."
+        })
 
     @app.errorhandler(HTTPException)
     def http_error(exc):

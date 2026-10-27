@@ -215,5 +215,49 @@ class TrainingInferenceConsistency(unittest.TestCase):
                     self.assertAlmostEqual(v, float(train_row[k]), places=3)
 
 
+class FrontendServingTests(unittest.TestCase):
+    def test_serve_frontend_when_dist_present(self):
+        with tempfile.TemporaryDirectory() as td:
+            dist = Path(td)
+            (dist / "index.html").write_text("<!doctype html><html><body>PhishGuard</body></html>", encoding="utf-8")
+            (dist / "assets").mkdir()
+            (dist / "assets" / "app.js").write_text("console.log('hi')", encoding="utf-8")
+            app = create_app(service=stub_service(0.1), frontend_dist=dist)
+            c = app.test_client()
+
+            # Root serves index.html
+            r_root = c.get("/")
+            self.assertEqual(r_root.status_code, 200)
+            self.assertIn(b"PhishGuard", r_root.data)
+            r_root.close()
+
+            # Static asset serves file
+            r_asset = c.get("/assets/app.js")
+            self.assertEqual(r_asset.status_code, 200)
+            self.assertIn(b"console.log", r_asset.data)
+            r_asset.close()
+
+            # Client-side SPA routes serve index.html
+            r_spa = c.get("/performance")
+            self.assertEqual(r_spa.status_code, 200)
+            self.assertIn(b"PhishGuard", r_spa.data)
+            r_spa.close()
+
+            # Unknown API path still gives 404 JSON
+            r_api_404 = c.get("/api/unknown")
+            self.assertEqual(r_api_404.status_code, 404)
+            self.assertEqual(r_api_404.json["error"]["code"], "not_found")
+            r_api_404.close()
+
+    def test_serve_fallback_when_dist_missing(self):
+        with tempfile.TemporaryDirectory() as td:
+            missing_dist = Path(td) / "does_not_exist"
+            app = create_app(service=stub_service(0.1), frontend_dist=missing_dist)
+            c = app.test_client()
+            r = c.get("/")
+            self.assertEqual(r.status_code, 200)
+            self.assertIn("message", r.json)
+
+
 if __name__ == "__main__":
     unittest.main()

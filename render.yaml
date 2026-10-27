@@ -1,26 +1,10 @@
 services:
-  # Flask Backend Web Service
+  # Single Render Web Service hosting both Flask backend and React frontend
   - type: web
-    name: phishguard-backend
+    name: phishguard-ai
     runtime: python
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT wsgi:app"
     envVars:
-      - key: FRONTEND_ORIGIN
-        sync: false
-
-  # React Frontend Static Site
-  - type: web
-    name: phishguard-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        sync: false
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+      - key: PYTHON_VERSION
+        value: 3.12.3
